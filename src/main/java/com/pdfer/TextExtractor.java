@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.apache.pdfbox.pdfparser.PDFParser;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.util.PDFTextStripper;
 
 /*
@@ -20,22 +21,36 @@ public class TextExtractor {
 	final static Logger logger = Logger.getLogger(TextExtractor.class);
 
 	/*
-	 * Pass the path of the PDF file in the argument.
+	 * This method accepts the path of the PDF from which text needs to be
+	 * extracted and returns the text.
+	 * 
+	 * @param pdfPath Path of the PDF file.
+	 * 
+	 * @return the content inside the PDF.
 	 */
-	public static void main(final String[] args) throws FileNotFoundException,
-			IOException {
+	public static String getTextFromPDF(final String pdfPath)
+			throws FileNotFoundException, IOException {
 		final PDFParser pdfParser = new PDFParser(new FileInputStream(new File(
-				args[0])));
+				pdfPath)));
+		String text = "";
 		try {
 			pdfParser.parse();
 			final PDFTextStripper pdfStripper = new PDFTextStripper("utf-8");
-			pdfStripper.setStartPage(1);
-			pdfStripper.setEndPage(1);
-			final String text = pdfStripper.getText(pdfParser.getPDDocument());
+			final PDDocument doc = pdfParser.getPDDocument();
+			text = pdfStripper.getText(doc);
 			TextExtractor.logger.info(text);
 		} finally {
 			pdfParser.clearResources();
 		}
+		return text;
+	}
+
+	/*
+	 * Pass the path of the PDF file in the argument.
+	 */
+	public static void main(final String[] args) throws FileNotFoundException,
+			IOException {
+		System.out.println(TextExtractor.getTextFromPDF(args[0]));
 	}
 
 }
